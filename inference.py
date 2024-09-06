@@ -16,20 +16,17 @@ parser.add_argument(
     "--checkpoint_path",
     type=str,
     help="Name of saved checkpoint to load weights from",
-    required=True,
 )
 
 parser.add_argument(
     "--face",
     type=str,
     help="Filepath of video/image that contains faces to use",
-    required=True,
 )
 parser.add_argument(
     "--audio",
     type=str,
     help="Filepath of video/audio file to use as raw audio source",
-    required=True,
 )
 parser.add_argument(
     "--outfile",
@@ -112,9 +109,6 @@ parser.add_argument(
 
 args = parser.parse_args()
 args.img_size = 96
-
-if os.path.isfile(args.face) and args.face.split(".")[1] in ["jpg", "png", "jpeg"]:
-    args.static = True
 
 
 def get_smoothened_boxes(boxes, T):
@@ -272,7 +266,13 @@ def load_model(path):
     return model.eval()
 
 
-def main():
+def main(opts={}):
+    for k, v in opts.items():
+        setattr(args, k, v)
+
+    if os.path.isfile(args.face) and args.face.split(".")[1] in ["jpg", "png", "jpeg"]:
+        args.static = True
+
     if not os.path.isfile(args.face):
         raise ValueError("--face argument must be a valid path to video/image file")
 
